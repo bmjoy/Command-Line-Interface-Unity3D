@@ -1,16 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ConsoleCommand : MonoBehaviour {
+[AttributeUsage(AttributeTargets.Method)]
+public class ConsoleCommand : Attribute {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }
