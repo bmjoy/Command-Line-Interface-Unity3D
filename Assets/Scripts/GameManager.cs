@@ -10,4 +10,10 @@ public class GameManager : MonoBehaviour {
         Debug.Log("Pong");
     }
 
+    [ConsoleCommand]
+    public void SetVariable(int x = 0)
+    {
+        Debug.Log("Variable set to " + x);
+    }
+
 }

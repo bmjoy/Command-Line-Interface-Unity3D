@@ -40,7 +40,7 @@ public class CLIManager : MonoBehaviour
         ClearSuggestions();
         //ClearOutput();
 
-        m_InputField.onValueChanged.AddListener(delegate { OnInputFieldChange(); });
+        m_InputField.onValueChanged.AddListener(delegate { OnInputFieldChanged(); });
 
         MethodInfo[] methods = GetAllMethods();
 
@@ -118,7 +118,7 @@ public class CLIManager : MonoBehaviour
 
     }
 
-    private void OnInputFieldChange()
+    private void OnInputFieldChanged()
     {
         string input = m_InputField.text;
         foreach (var node in nodes)
