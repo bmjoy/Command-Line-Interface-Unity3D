@@ -45,6 +45,10 @@ public class CLIManager : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Returns all methods from active <see cref="MonoBehaviour"/>s in the scene
+    /// </summary>
+    /// <returns></returns>
     private MethodInfo[] GetAllMethods()
     {
         MonoBehaviour[] active = FindObjectsOfType<MonoBehaviour>();
@@ -54,23 +58,32 @@ public class CLIManager : MonoBehaviour {
         foreach (MonoBehaviour mono in active)
         {
             methods.AddRange(mono.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public));
-
-            //for (int i = 0; i < methods.Length; i++)
-            //{
-            //    ConsoleCommand cmd = Attribute.GetCustomAttribute(methods[i], typeof(ConsoleCommand)) as ConsoleCommand;
-
-
-
-            //    if (cmd != null)
-            //    {
-            //        Debug.Log(methods[i].DeclaringType);
-            //        Debug.Log(methods[i].Name);
-            //        Debug.Log(methods[i].ReturnParameter.ParameterType);
-            //        methods[i].Invoke(mono, null);
-            //    }
-            //}
         }
 
         return methods.ToArray();
     }
+
+    /// <summary>
+    /// Returns a <see cref="ConsoleCommand"/>, if there is no Atrribute assigned it will return null
+    /// </summary>
+    /// <param name="method"></param>
+    /// <returns></returns>
+    private ConsoleCommand GetConsoleCommand(MethodInfo method)
+    {
+        return Attribute.GetCustomAttribute(method, typeof(ConsoleCommand)) as ConsoleCommand;
+    }
+
+    /// <summary>
+    /// Returns true if a method is a console command
+    /// </summary>
+    /// <param name="method"></param>
+    /// <returns></returns>
+    private bool IsCommand(MethodInfo method)
+    {
+        ConsoleCommand cmd = Attribute.GetCustomAttribute(method, typeof(ConsoleCommand)) as ConsoleCommand;
+
+        return (cmd == null) ? false : true;
+    }
+
+
 }
