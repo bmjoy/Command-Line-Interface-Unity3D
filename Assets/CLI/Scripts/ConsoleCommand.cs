@@ -6,5 +6,4 @@ using UnityEngine;
 [AttributeUsage(AttributeTargets.Method)]
 public class ConsoleCommand : Attribute {
 
-	
 }

@@ -102,14 +102,8 @@ public class CLIManager : MonoBehaviour
         {
             string input = m_InputField.text;
 
-            foreach (var node in nodes)
-            {
-                if (input != "" && node.name.ToLower().StartsWith(input.ToLower()))
-                {
-                    m_InputField.text = node.name + ".";
-                    m_InputField.caretPosition = m_InputField.text.Length;
-                }
-            }
+            m_InputField.text = GetSuggestions(input)[0].path;
+            m_InputField.MoveTextEnd(false);
         }
 
     }
@@ -118,32 +112,60 @@ public class CLIManager : MonoBehaviour
     {
         string input = m_InputField.text;
 
-        string[] splitInput = input.Split('.');
 
-        int splitIndex = 0;
+        CLISuggestion[] suggestions = GetSuggestions(input);
+        m_SuggestionsText.text = "";
 
-        CLINode n = FindNode(input);
+        string s = "";
+        for (int i = 0; i < suggestions.Length; i++)
+        {
+            s += suggestions[i].path + ((suggestions[i].node.children.Count > 0) ? "..." : "") + "\n";
+        }
 
-        if (n != null)
-            print(n.name);
+        m_SuggestionsText.text = s;
+    }
 
-        //foreach (var node in nodes)
-        //{
-        //    // Compare nodes with input
-        //}
 
-        //foreach (var node in nodes)
-        //{
-        //    if (input != "" && node.name.ToLower().StartsWith(input.ToLower()))
-        //    {
-        //        ClearSuggestions();
-        //        m_SuggestionsText.text = node.name + "...";
-        //    }
-        //    else
-        //    {
-        //        ClearSuggestions();
-        //    }
-        //}
+    private CLISuggestion[] GetSuggestions(string path)
+    {
+        List<CLISuggestion> suggestions = new List<CLISuggestion>();
+
+        if (path == "") return suggestions.ToArray();
+
+        string[] split = path.Split('.');
+
+        int lastSeparatorIndex = path.LastIndexOf('.');
+
+        if (lastSeparatorIndex < 0) lastSeparatorIndex = 0;
+
+        string parentPath = path.Substring(0, lastSeparatorIndex);
+
+        CLINode lastCompleteNode = FindNode(parentPath);
+
+        List<CLINode> currentNodes = new List<CLINode>();
+
+        if (lastCompleteNode == null)
+        {
+            currentNodes = nodes;
+        }
+        else
+        {
+            currentNodes = lastCompleteNode.children;
+        }
+
+        foreach (var node in currentNodes)
+        {
+            if (/*split[split.Length - 1] != "" &&*/ node.name.ToLower().StartsWith(split[split.Length - 1].ToLower()))
+            {
+                string suggestion = parentPath + ((parentPath == "") ? "" : ".") + node.name /*+ ((node.children.Count > 0) ? "..." : "")*/;
+
+                suggestions.Add(new CLISuggestion(suggestion, node));
+            }
+            
+        }
+
+
+        return suggestions.ToArray();
     }
 
     private void ClearSuggestions()
@@ -164,14 +186,14 @@ public class CLIManager : MonoBehaviour
     private CLINode FindNode(string path)
     {
         string[] split = path.Split('.');
-        
+
         List<CLINode> currentNodes = nodes;
 
         for (int splitIndex = 0; splitIndex < split.Length; splitIndex++)
         {
             foreach (var node in currentNodes)
             {
-                if (node.name == split[splitIndex]) 
+                if (node.name == split[splitIndex])
                 {
                     // Found a matching node
 
