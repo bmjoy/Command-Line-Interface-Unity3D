@@ -42,45 +42,9 @@ public class CLIManager : MonoBehaviour
 
         m_InputField.onValueChanged.AddListener(delegate { OnInputFieldChanged(); });
 
-        MethodInfo[] methods = GetAllMethods();
-
-
 
         // Construct node tree
-        for (int i = 0; i < methods.Length; i++)
-        {
-            ConsoleCommand command = GetConsoleCommand(methods[i]);
-
-            if (command != null)
-            {
-                CLINode childNode = new CLINode();
-
-                childNode.name = methods[i].Name;
-                childNode.method = methods[i];
-
-                string baseNodeName = methods[i].DeclaringType.ToString();
-
-                CLINode baseNode = GetNodeByName(baseNodeName);
-
-                if (baseNode != null)
-                {
-                    // Base node exists
-                    baseNode.children.Add(childNode);
-                }
-                else
-                {
-                    // Base node doesn't exist
-                    baseNode = new CLINode();
-
-                    baseNode.name = methods[i].DeclaringType.ToString();
-                    baseNode.children.Add(childNode);
-
-                    nodes.Add(baseNode);
-                }
-            }
-        }
-
-        //print(nodes[0].children[0].name);
+        ConstructNodeTree();
 
     }
 
@@ -106,6 +70,11 @@ public class CLIManager : MonoBehaviour
             m_InputField.MoveTextEnd(false);
         }
 
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            m_InputField.text = "";
+            m_InputField.ActivateInputField();
+        }
     }
 
     private void OnInputFieldChanged()
@@ -161,7 +130,7 @@ public class CLIManager : MonoBehaviour
 
                 suggestions.Add(new CLISuggestion(suggestion, node));
             }
-            
+
         }
 
 
@@ -214,11 +183,11 @@ public class CLIManager : MonoBehaviour
         return null;
     }
 
-    private CLINode GetNodeByName(string name)
+    private CLINode GetNode(List<CLINode> nodeCollection, string name)
     {
-        for (int i = 0; i < nodes.Count; i++)
+        for (int i = 0; i < nodeCollection.Count; i++)
         {
-            return (nodes[i].name == name) ? nodes[i] : null;
+            return (nodeCollection[i].name == name) ? nodes[i] : null;
         }
         return null;
     }
@@ -230,6 +199,79 @@ public class CLIManager : MonoBehaviour
             return (nodes[i].name == name) ? true : false;
         }
         return false;
+    }
+
+    private void ConstructNodeTree()
+    {
+        MethodInfo[] methods = GetAllMethods();
+
+        for (int i = 0; i < methods.Length; i++)
+        {
+            ConsoleCommand command = GetConsoleCommand(methods[i]);
+
+            if (command != null)
+            {
+                // Custom path
+
+                if (command.customPath != "")
+                {
+
+                    string[] split = command.customPath.Split('.');
+
+                    List<CLINode> currentNodeList = nodes;
+
+                    for (int splitIndex = 0; splitIndex < split.Length; splitIndex++)
+                    {
+                        CLINode n = GetNode(currentNodeList, split[splitIndex]);
+
+                        if (n == null)
+                        {
+                            n = new CLINode();
+                            n.name = split[splitIndex];
+                            currentNodeList.Add(n);
+                        }
+
+                        currentNodeList = n.children;
+
+                        if (splitIndex == split.Length - 1)
+                        {
+                            CLINode finalNode = new CLINode();
+                            finalNode.name = methods[i].Name;
+                            finalNode.method = methods[i];
+                            n.children.Add(finalNode);
+                        }
+                    }
+
+                }
+
+                // Type path
+
+                CLINode childNode = new CLINode();
+
+                childNode.name = methods[i].Name;
+                childNode.method = methods[i];
+
+                string baseNodeName = methods[i].DeclaringType.ToString();
+
+                CLINode baseNode = GetNode(nodes, baseNodeName);
+
+                if (baseNode != null)
+                {
+                    // Base node exists
+                    baseNode.children.Add(childNode);
+                }
+                else
+                {
+                    // Base node doesn't exist
+                    baseNode = new CLINode();
+
+                    baseNode.name = methods[i].DeclaringType.ToString();
+                    baseNode.children.Add(childNode);
+
+                    nodes.Add(baseNode);
+                }
+            }
+        }
     }
 
     /// <summary>

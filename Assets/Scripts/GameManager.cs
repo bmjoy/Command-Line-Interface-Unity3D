@@ -22,4 +22,10 @@ public class GameManager : MonoBehaviour {
         Debug.Log("Variable set to " + x);
     }
 
+    [ConsoleCommand("Misc.Random")]
+    public void PrintRandomNumber()
+    {
+        Debug.Log(Random.Range(0, 10000));
+    }
+
 }
