@@ -80,10 +80,7 @@ public class CLIManager : MonoBehaviour
             }
         }
 
-        foreach (var n in nodes)
-        {
-            print(n.name);
-        }
+        //print(nodes[0].children[0].name);
 
     }
 
@@ -115,24 +112,38 @@ public class CLIManager : MonoBehaviour
             }
         }
 
-
     }
 
     private void OnInputFieldChanged()
     {
         string input = m_InputField.text;
-        foreach (var node in nodes)
-        {
-            if (input != "" && node.name.ToLower().StartsWith(input.ToLower()))
-            {
-                ClearSuggestions();
-                m_SuggestionsText.text = node.name + "...";
-            }
-            else
-            {
-                ClearSuggestions();
-            }
-        }
+
+        string[] splitInput = input.Split('.');
+
+        int splitIndex = 0;
+
+        CLINode n = FindNode(input);
+
+        if (n != null)
+            print(n.name);
+
+        //foreach (var node in nodes)
+        //{
+        //    // Compare nodes with input
+        //}
+
+        //foreach (var node in nodes)
+        //{
+        //    if (input != "" && node.name.ToLower().StartsWith(input.ToLower()))
+        //    {
+        //        ClearSuggestions();
+        //        m_SuggestionsText.text = node.name + "...";
+        //    }
+        //    else
+        //    {
+        //        ClearSuggestions();
+        //    }
+        //}
     }
 
     private void ClearSuggestions()
@@ -143,6 +154,42 @@ public class CLIManager : MonoBehaviour
     private void ClearOutput()
     {
         throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Returns a node with the given path (node names separated with '.')
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    private CLINode FindNode(string path)
+    {
+        string[] split = path.Split('.');
+        
+        List<CLINode> currentNodes = nodes;
+
+        for (int splitIndex = 0; splitIndex < split.Length; splitIndex++)
+        {
+            foreach (var node in currentNodes)
+            {
+                if (node.name == split[splitIndex]) 
+                {
+                    // Found a matching node
+
+                    if (splitIndex == split.Length - 1) return node;
+
+                    if (node.children.Count > 0)
+                    {
+                        currentNodes = node.children;
+                    }
+                    else
+                    {
+                        return node;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     private CLINode GetNodeByName(string name)
