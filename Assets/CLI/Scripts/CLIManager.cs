@@ -20,6 +20,8 @@ public class CLIManager : MonoBehaviour {
     [SerializeField]
     private Text m_OutputText;
 
+    private List<CLINode> nodes = new List<CLINode>();
+
     private void Start()
     {
         var eventSystem = FindObjectOfType<EventSystem>();
@@ -35,8 +37,9 @@ public class CLIManager : MonoBehaviour {
 
         MethodInfo[] methods = GetAllMethods();
 
-        List<CLINode> nodes = new List<CLINode>();
+        
 
+        // Construct node tree
         for (int i = 0; i < methods.Length; i++)
         {
             CLINode childNode = new CLINode();
@@ -46,7 +49,7 @@ public class CLIManager : MonoBehaviour {
 
             string baseNodeName = methods[i].DeclaringType.ToString();
 
-            CLINode baseNode = GetNodeByName(nodes, baseNodeName);
+            CLINode baseNode = GetNodeByName(baseNodeName);
 
             if(baseNode != null)
             {
@@ -95,10 +98,13 @@ public class CLIManager : MonoBehaviour {
 
     private void OnInputFieldChange()
     {
-        
+        foreach (var node in nodes)
+        {
+
+        }
     }
 
-    private CLINode GetNodeByName(List<CLINode> nodes, string name)
+    private CLINode GetNodeByName(string name)
     {
         for (int i = 0; i < nodes.Count; i++)
         {
@@ -107,7 +113,7 @@ public class CLIManager : MonoBehaviour {
         return null;
     }
 
-    private bool NodeExists(List<CLINode> nodes, string name)
+    private bool NodeExists(string name)
     {
         for (int i = 0; i < nodes.Count; i++)
         {
