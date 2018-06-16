@@ -6,7 +6,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class CLIManager : MonoBehaviour {
+public class CLIManager : MonoBehaviour
+{
 
     [SerializeField]
     private RectTransform m_CLIPanel;
@@ -33,44 +34,56 @@ public class CLIManager : MonoBehaviour {
         }
 
         // Initialization
+        m_InputField.Select();
+        m_InputField.ActivateInputField();
+
+        ClearSuggestions();
+        //ClearOutput();
+
         m_InputField.onValueChanged.AddListener(delegate { OnInputFieldChange(); });
 
         MethodInfo[] methods = GetAllMethods();
 
-        
+
 
         // Construct node tree
         for (int i = 0; i < methods.Length; i++)
         {
-            CLINode childNode = new CLINode();
+            ConsoleCommand command = GetConsoleCommand(methods[i]);
 
-            childNode.name = methods[i].Name;
-            childNode.method = methods[i];
-
-            string baseNodeName = methods[i].DeclaringType.ToString();
-
-            CLINode baseNode = GetNodeByName(baseNodeName);
-
-            if(baseNode != null)
+            if (command != null)
             {
-                // Base node exists
-                baseNode.children.Add(childNode);
-            }
-            else
-            {
-                // Base node doesn't exist
-                baseNode = new CLINode();
+                CLINode childNode = new CLINode();
 
-                baseNode.name = methods[i].DeclaringType.ToString();
-                baseNode.children.Add(childNode);
+                childNode.name = methods[i].Name;
+                childNode.method = methods[i];
 
-                nodes.Add(baseNode);
+                string baseNodeName = methods[i].DeclaringType.ToString();
+
+                CLINode baseNode = GetNodeByName(baseNodeName);
+
+                if (baseNode != null)
+                {
+                    // Base node exists
+                    baseNode.children.Add(childNode);
+                }
+                else
+                {
+                    // Base node doesn't exist
+                    baseNode = new CLINode();
+
+                    baseNode.name = methods[i].DeclaringType.ToString();
+                    baseNode.children.Add(childNode);
+
+                    nodes.Add(baseNode);
+                }
             }
-            
-            
-            
         }
 
+        foreach (var n in nodes)
+        {
+            print(n.name);
+        }
 
     }
 
@@ -90,7 +103,16 @@ public class CLIManager : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.Tab))
         {
+            string input = m_InputField.text;
 
+            foreach (var node in nodes)
+            {
+                if (input != "" && node.name.ToLower().StartsWith(input.ToLower()))
+                {
+                    m_InputField.text = node.name + ".";
+                    m_InputField.caretPosition = m_InputField.text.Length;
+                }
+            }
         }
 
 
@@ -98,10 +120,29 @@ public class CLIManager : MonoBehaviour {
 
     private void OnInputFieldChange()
     {
+        string input = m_InputField.text;
         foreach (var node in nodes)
         {
-
+            if (input != "" && node.name.ToLower().StartsWith(input.ToLower()))
+            {
+                ClearSuggestions();
+                m_SuggestionsText.text = node.name + "...";
+            }
+            else
+            {
+                ClearSuggestions();
+            }
         }
+    }
+
+    private void ClearSuggestions()
+    {
+        m_SuggestionsText.text = "";
+    }
+
+    private void ClearOutput()
+    {
+        throw new NotImplementedException();
     }
 
     private CLINode GetNodeByName(string name)

@@ -5,9 +5,9 @@ using UnityEngine;
 public class GameManager : MonoBehaviour {
 
 	[ConsoleCommand]
-    public void TestMethod()
+    public void Ping()
     {
-
+        Debug.Log("Pong");
     }
 
 }
