@@ -15,7 +15,7 @@ public class CLINode
 
     public MethodInfo method;
 
-    public List<CLINode> children;
+    public List<CLINode> children = new List<CLINode>();
 
     public string name;
 

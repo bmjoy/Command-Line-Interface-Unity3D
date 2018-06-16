@@ -25,9 +25,50 @@ public class CLIManager : MonoBehaviour {
         var eventSystem = FindObjectOfType<EventSystem>();
 
         if (eventSystem == null)
+        {
             Debug.LogError("No UI EventSystem is present in the current scene!");
+            return;
+        }
 
-        GetAllMethods();
+        // Initialization
+        m_InputField.onValueChanged.AddListener(delegate { OnInputFieldChange(); });
+
+        MethodInfo[] methods = GetAllMethods();
+
+        List<CLINode> nodes = new List<CLINode>();
+
+        for (int i = 0; i < methods.Length; i++)
+        {
+            CLINode childNode = new CLINode();
+
+            childNode.name = methods[i].Name;
+            childNode.method = methods[i];
+
+            string baseNodeName = methods[i].DeclaringType.ToString();
+
+            CLINode baseNode = GetNodeByName(nodes, baseNodeName);
+
+            if(baseNode != null)
+            {
+                // Base node exists
+                baseNode.children.Add(childNode);
+            }
+            else
+            {
+                // Base node doesn't exist
+                baseNode = new CLINode();
+
+                baseNode.name = methods[i].DeclaringType.ToString();
+                baseNode.children.Add(childNode);
+
+                nodes.Add(baseNode);
+            }
+            
+            
+            
+        }
+
+
     }
 
     private void Update()
@@ -43,6 +84,36 @@ public class CLIManager : MonoBehaviour {
                 m_InputField.ActivateInputField();
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+
+        }
+
+
+    }
+
+    private void OnInputFieldChange()
+    {
+        
+    }
+
+    private CLINode GetNodeByName(List<CLINode> nodes, string name)
+    {
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            return (nodes[i].name == name) ? nodes[i] : null;
+        }
+        return null;
+    }
+
+    private bool NodeExists(List<CLINode> nodes, string name)
+    {
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            return (nodes[i].name == name) ? true : false;
+        }
+        return false;
     }
 
     /// <summary>
@@ -74,11 +145,31 @@ public class CLIManager : MonoBehaviour {
     }
 
     /// <summary>
+    /// Returns an array of <see cref="ConsoleCommand"/>s
+    /// </summary>
+    /// <param name="methods"></param>
+    /// <returns></returns>
+    private ConsoleCommand[] GetConsoleCommands(MethodInfo[] methods)
+    {
+        List<ConsoleCommand> cmds = new List<ConsoleCommand>();
+
+        for (int i = 0; i < methods.Length; i++)
+        {
+            ConsoleCommand cmd = Attribute.GetCustomAttribute(methods[i], typeof(ConsoleCommand)) as ConsoleCommand;
+
+            if (cmd != null)
+                cmds.Add(cmd);
+        }
+
+        return cmds.ToArray();
+    }
+
+    /// <summary>
     /// Returns true if a method is a console command
     /// </summary>
     /// <param name="method"></param>
     /// <returns></returns>
-    private bool IsCommand(MethodInfo method)
+    private bool IsConsoleCommand(MethodInfo method)
     {
         ConsoleCommand cmd = Attribute.GetCustomAttribute(method, typeof(ConsoleCommand)) as ConsoleCommand;
 
