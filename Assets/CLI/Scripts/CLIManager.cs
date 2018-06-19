@@ -38,7 +38,7 @@ public class CLIManager : MonoBehaviour
         m_InputField.ActivateInputField();
 
         ClearSuggestions();
-        //ClearOutput();
+        ClearOutput();
 
         m_InputField.onValueChanged.AddListener(delegate { OnInputFieldChanged(); });
 
@@ -72,6 +72,19 @@ public class CLIManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Return))
         {
+            string[] split = m_InputField.text.Split(' ');
+
+            CLINode node = FindNode(split[0]);
+            
+            if(node != null)
+            {
+                PrintOutput(m_InputField.text);
+            }
+            else
+            {
+                PrintOutput("'" + m_InputField.text + "' is not a valid command!");
+            }
+
             m_InputField.text = "";
             m_InputField.ActivateInputField();
         }
@@ -137,6 +150,11 @@ public class CLIManager : MonoBehaviour
         return suggestions.ToArray();
     }
 
+    private void PrintOutput(string text)
+    {
+        m_OutputText.text += text + "\n\n";
+    }
+
     private void ClearSuggestions()
     {
         m_SuggestionsText.text = "";
@@ -144,7 +162,7 @@ public class CLIManager : MonoBehaviour
 
     private void ClearOutput()
     {
-        throw new NotImplementedException();
+        m_OutputText.text = "";
     }
 
     /// <summary>
