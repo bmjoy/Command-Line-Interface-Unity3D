@@ -28,4 +28,10 @@ public class GameManager : MonoBehaviour {
         Debug.Log(Random.Range(0, 10000));
     }
 
+    [ConsoleCommand("Misc.Random")]
+    public int GetRandomNumber()
+    {
+        return Random.Range(0, 10000);
+    }
+
 }
