@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour {
 
-	[ConsoleCommand]
+    [ConsoleCommand]
     public void Ping()
     {
         Debug.Log("Pong");
@@ -17,9 +17,27 @@ public class GameManager : MonoBehaviour {
     }
 
     [ConsoleCommand]
-    public void SetVariable(int x = 0)
+    public void SetInt(int x)
     {
         Debug.Log("Variable set to " + x);
+    }
+
+    [ConsoleCommand]
+    public void SetFloat(float x)
+    {
+        Debug.Log("Variable set to " + x);
+    }
+
+    [ConsoleCommand]
+    public void SetString(string x)
+    {
+        Debug.Log("Variable set to " + x);
+    }
+
+    [ConsoleCommand]
+    public void SetMultiple(int x, string s)
+    {
+        Debug.Log("Variable set to " + x + " and " + s);
     }
 
     [ConsoleCommand("Misc.Random")]

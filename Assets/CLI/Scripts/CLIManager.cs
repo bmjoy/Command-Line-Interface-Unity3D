@@ -69,11 +69,16 @@ public class CLIManager : MonoBehaviour
         {
             string input = m_InputField.text;
 
-            m_InputField.text = GetSuggestions(input)[0].path;
-            m_InputField.MoveTextEnd(false);
+            CLISuggestion[] suggestions = GetSuggestions(input);
+
+            if (suggestions.Length > 0)
+            {
+                m_InputField.text = suggestions[0].path;
+                m_InputField.MoveTextEnd(false);
+            }
         }
 
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
         {
             string[] split = m_InputField.text.Split(' ');
 
@@ -82,8 +87,32 @@ public class CLIManager : MonoBehaviour
             if (node != null && node.method != null)
             {
                 // Valid command
-                object obj = node.method.Invoke(node.monoBehaviour, null);
+
+                List<object> parameters = new List<object>();
+
+                var parameterTypes = node.method.GetParameters();
+
+                for (int i = 1; i < split.Length; i++)
+                {
+                    //int x = Convert.ToInt32(split[i]);
+                    //print(parameterTypes[i-1].ParameterType.ToString() + (parameterTypes[i - 1].ParameterType == typeof(int)));
+
+                    try
+                    {
+                        var x = Convert.ChangeType(split[i], parameterTypes[i - 1].ParameterType);
+                        parameters.Add(x);
+
+                    }
+                    catch (Exception e)
+                    {
+
+                        Debug.LogError(e);
+                    }
+
+                }
+                object obj = node.method.Invoke(node.monoBehaviour, parameters.ToArray());
                 PrintOutput(m_InputField.text + "\n" + obj);
+
             }
             else
             {
@@ -106,7 +135,7 @@ public class CLIManager : MonoBehaviour
         string s = "";
         for (int i = 0; i < suggestions.Length; i++)
         {
-            s += suggestions[i].path + ((suggestions[i].node.children.Count > 0) ? "..." : "") + "\n";
+            s += suggestions[i].path + ((suggestions[i].node.children.Count > 0) ? "..." : "") + " " + suggestions[i].typeText + "\n";
         }
 
         m_SuggestionsText.text = s;
@@ -144,9 +173,29 @@ public class CLIManager : MonoBehaviour
         {
             if (/*split[split.Length - 1] != "" &&*/ node.name.ToLower().StartsWith(split[split.Length - 1].ToLower()))
             {
-                string suggestion = parentPath + ((parentPath == "") ? "" : ".") + node.name /*+ ((node.children.Count > 0) ? "..." : "")*/;
+                string suggestion = parentPath + ((parentPath == "") ? "" : ".") + node.name;
+                string typeText = "";
 
-                suggestions.Add(new CLISuggestion(suggestion, node));
+                if (node.method != null)
+                {
+                    var parameters = node.method.GetParameters();
+
+                    if (parameters.Length > 0)
+                    {
+                        typeText = "(";
+
+                        for (int i = 0; i < parameters.Length; i++)
+                        {
+                            typeText += TypeAliases[parameters[i].ParameterType];
+                            if (i < parameters.Length - 1) typeText += ", ";
+                        }
+
+                        typeText += ")";
+                    }
+                }
+
+
+                suggestions.Add(new CLISuggestion(suggestion, typeText, node));
             }
 
         }
@@ -210,7 +259,7 @@ public class CLIManager : MonoBehaviour
     {
         for (int i = 0; i < nodeCollection.Count; i++)
         {
-            if(nodeCollection[i].name == name)
+            if (nodeCollection[i].name == name)
             {
                 return nodeCollection[i];
             }
@@ -382,5 +431,37 @@ public class CLIManager : MonoBehaviour
         return (cmd == null) ? false : true;
     }
 
+    private static readonly Dictionary<Type, string> TypeAliases = new Dictionary<Type, string>()
+    {
+        { typeof(byte), "byte" },
+        { typeof(sbyte), "sbyte" },
+        { typeof(short), "short" },
+        { typeof(ushort), "ushort" },
+        { typeof(int), "int" },
+        { typeof(uint), "uint" },
+        { typeof(long), "long" },
+        { typeof(ulong), "ulong" },
+        { typeof(float), "float" },
+        { typeof(double), "double" },
+        { typeof(decimal), "decimal" },
+        { typeof(object), "object" },
+        { typeof(bool), "bool" },
+        { typeof(char), "char" },
+        { typeof(string), "string" },
+        { typeof(void), "void" },
+        { typeof(Nullable<byte>), "byte?" },
+        { typeof(Nullable<sbyte>), "sbyte?" },
+        { typeof(Nullable<short>), "short?" },
+        { typeof(Nullable<ushort>), "ushort?" },
+        { typeof(Nullable<int>), "int?" },
+        { typeof(Nullable<uint>), "uint?" },
+        { typeof(Nullable<long>), "long?" },
+        { typeof(Nullable<ulong>), "ulong?" },
+        { typeof(Nullable<float>), "float?" },
+        { typeof(Nullable<double>), "double?" },
+        { typeof(Nullable<decimal>), "decimal?" },
+        { typeof(Nullable<bool>), "bool?" },
+        { typeof(Nullable<char>), "char?" }
+    };
 
 }
