@@ -3,17 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[AttributeUsage(AttributeTargets.Method)]
-public class ConsoleCommand : Attribute
+namespace CLI
 {
-
-    public ConsoleCommand() { }
-
-    public ConsoleCommand(string customPath)
+    [AttributeUsage(AttributeTargets.Method)]
+    public class ConsoleCommand : Attribute
     {
-        this.customPath = customPath;
+
+        public ConsoleCommand() { }
+
+        public ConsoleCommand(string customPath)
+        {
+            this.customPath = customPath;
+        }
+
+        public string customPath = String.Empty;
+
     }
-
-    public string customPath = String.Empty;
-
 }
