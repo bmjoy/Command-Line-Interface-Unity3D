@@ -27,6 +27,8 @@ namespace CLI
 
         private MethodData[] methodData;
 
+        private string lastCommand;
+
         [MenuItem("CLI/Add CLI")]
         static void CreateCLIObjects()
         {
@@ -98,8 +100,15 @@ namespace CLI
                 }
             }
 
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                m_InputField.text = lastCommand;
+            }
+
             if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
             {
+                lastCommand = m_InputField.text;
+
                 string[] split = m_InputField.text.Split(' ');
 
                 CLINode node = FindNode(split[0]);
