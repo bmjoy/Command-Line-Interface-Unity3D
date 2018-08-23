@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -26,6 +27,19 @@ namespace CLI
         private List<CLINode> nodes = new List<CLINode>();
 
         private MethodData[] methodData;
+
+        [MenuItem("CLI/Add CLI")]
+        static void CreateCLIObjects()
+        {
+            Debug.Log("CLI has been added to the current Scene.");
+
+            if (FindObjectOfType<EventSystem>() == null)
+                EditorApplication.ExecuteMenuItem("GameObject/UI/Event System");
+
+            
+            GameObject canvas = Instantiate((GameObject)Resources.Load("Prefabs/CLI Canvas", typeof(GameObject)));
+            canvas.name = "CLI Canvas";
+        }
 
         private void Start()
         {
