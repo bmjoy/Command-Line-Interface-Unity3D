@@ -103,6 +103,7 @@ namespace CLI
             if (Input.GetKeyDown(KeyCode.UpArrow))
             {
                 m_InputField.text = lastCommand;
+                m_InputField.caretPosition = m_InputField.text.Length;
             }
 
             if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
