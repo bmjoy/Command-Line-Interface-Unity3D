@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -277,11 +277,12 @@ namespace CLI
 
         private bool NodeExists(string name)
         {
+            bool exists = false;
             for (int i = 0; i < nodes.Count; i++)
             {
-                return (nodes[i].name == name) ? true : false;
+                exists = (nodes[i].name == name) ? true : false;
             }
-            return false;
+            return exists;
         }
 
         private void ConstructNodeTree()
