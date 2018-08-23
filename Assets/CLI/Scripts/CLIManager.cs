@@ -21,8 +21,7 @@ namespace CLI
         [SerializeField]
         private Text m_SuggestionsText;
 
-        [SerializeField]
-        private Text m_OutputText;
+        private static Text outputText;
 
         private List<CLINode> nodes = new List<CLINode>();
 
@@ -36,9 +35,14 @@ namespace CLI
             if (FindObjectOfType<EventSystem>() == null)
                 EditorApplication.ExecuteMenuItem("GameObject/UI/Event System");
 
-            
+
             GameObject canvas = Instantiate((GameObject)Resources.Load("Prefabs/CLI Canvas", typeof(GameObject)));
             canvas.name = "CLI Canvas";
+        }
+
+        private void Awake()
+        {
+            outputText = transform.Find("CLI Panel/Output Text").GetComponent<Text>();
         }
 
         private void Start()
@@ -126,13 +130,17 @@ namespace CLI
                         }
 
                     }
-                    object obj = node.method.Invoke(node.monoBehaviour, parameters.ToArray());
-                    PrintOutput(m_InputField.text + "\n" + obj);
 
+                    Log(m_InputField.text);
+                    object obj = node.method.Invoke(node.monoBehaviour, parameters.ToArray());
+                    if (obj == null)
+                        Log("Return value: null\n");
+                    else
+                        Log("Return value: " + obj.ToString() + "\n");
                 }
                 else
                 {
-                    PrintOutput("'" + m_InputField.text + "' is not a valid command!");
+                    Log("'" + m_InputField.text + "' is not a valid command!\n");
                 }
 
                 m_InputField.text = "";
@@ -222,9 +230,9 @@ namespace CLI
             return suggestions.ToArray();
         }
 
-        private void PrintOutput(string text)
+        public static void Log(string s)
         {
-            m_OutputText.text += text + "\n\n";
+            outputText.text += s + "\n";
         }
 
         private void ClearSuggestions()
@@ -234,7 +242,7 @@ namespace CLI
 
         private void ClearOutput()
         {
-            m_OutputText.text = "";
+            outputText.text = "";
         }
 
         /// <summary>

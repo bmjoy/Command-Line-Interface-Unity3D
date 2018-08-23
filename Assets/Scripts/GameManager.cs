@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour {
     public void Ping()
     {
         Debug.Log("Pong");
+        CLIManager.Log("Pong");
     }
 
     [ConsoleCommand]
