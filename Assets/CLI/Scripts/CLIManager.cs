@@ -164,7 +164,9 @@ namespace CLI
 
             if (lastCompleteNode == null)
             {
-                currentNodes = nodes;
+                // Only use the whole node tree if there is no seperator ('.') present
+                if (!path.Contains("."))
+                    currentNodes = nodes;
             }
             else
             {
