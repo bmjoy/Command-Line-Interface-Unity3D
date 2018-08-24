@@ -16,6 +16,12 @@ namespace CLI
         private RectTransform m_CLIPanel;
 
         [SerializeField]
+        private RectTransform menu;
+
+        [SerializeField]
+        private GameObject menuButtonPrefab;
+
+        [SerializeField]
         private InputField m_InputField;
 
         [SerializeField]
@@ -25,9 +31,14 @@ namespace CLI
 
         private List<CLINode> nodes = new List<CLINode>();
 
-        private MethodData[] methodData;
+        private CLIMethodData[] methodData;
 
         private string lastCommand;
+
+        [HideInInspector]
+        public List<CLIMenuDropDown> openDropdowns = new List<CLIMenuDropDown>();
+
+        public static CLIManager Instance { get; set; }
 
         [MenuItem("CLI/Add CLI")]
         static void CreateCLIObjects()
@@ -44,6 +55,15 @@ namespace CLI
 
         private void Awake()
         {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Destroy(this);
+            }
+
             outputText = transform.Find("CLI Panel/Output Text").GetComponent<Text>();
         }
 
@@ -70,6 +90,18 @@ namespace CLI
 
             // Construct node tree
             ConstructNodeTree();
+
+            // Add menu buttons
+            foreach (var node in nodes)
+            {
+                GameObject menuButton = Instantiate(menuButtonPrefab);
+                menuButton.GetComponentInChildren<Text>().text = node.name;
+
+                CLIMenuButton m = menuButton.GetComponent<CLIMenuButton>();
+                m.isRoot = true;
+
+                menuButton.transform.SetParent(menu);
+            }
 
         }
 
@@ -404,18 +436,18 @@ namespace CLI
         }
 
         /// <summary>
-        /// Returns a list of <see cref="MethodData"/> from active <see cref="MonoBehaviour"/>s in the scene
+        /// Returns a list of <see cref="CLIMethodData"/> from active <see cref="MonoBehaviour"/>s in the scene
         /// </summary>
         /// <returns></returns>
-        private MethodData[] GetMethodData()
+        private CLIMethodData[] GetMethodData()
         {
             MonoBehaviour[] active = FindObjectsOfType<MonoBehaviour>();
 
-            List<MethodData> methodData = new List<MethodData>();
+            List<CLIMethodData> methodData = new List<CLIMethodData>();
 
             foreach (MonoBehaviour mono in active)
             {
-                MethodData data = new MethodData();
+                CLIMethodData data = new CLIMethodData();
                 data.methods.AddRange(mono.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public));
                 data.monoBehaviour = mono;
 
@@ -500,6 +532,16 @@ namespace CLI
         { typeof(Nullable<bool>), "bool?" },
         { typeof(Nullable<char>), "char?" }
     };
+
+        public void DestroyAllDropDowns()
+        {
+            for (int i = openDropdowns.Count - 1; i >= 0; i--)
+            {
+                openDropdowns[i].button.dropdownOpen = false;
+                Destroy(openDropdowns[i].gameObject);
+                openDropdowns.Remove(openDropdowns[i]);
+            }
+        }
 
     }
 }
