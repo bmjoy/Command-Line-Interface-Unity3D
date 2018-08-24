@@ -5,19 +5,19 @@ using UnityEngine;
 
 namespace CLI
 {
-    public class MethodData
+    public class CLIMethodData
     {
 
         public MonoBehaviour monoBehaviour;
         public List<MethodInfo> methods;
 
-        public MethodData()
+        public CLIMethodData()
         {
             monoBehaviour = null;
             methods = new List<MethodInfo>();
         }
 
-        public MethodData(MonoBehaviour monoBehaviour, List<MethodInfo> methods)
+        public CLIMethodData(MonoBehaviour monoBehaviour, List<MethodInfo> methods)
         {
             this.monoBehaviour = monoBehaviour;
             this.methods = methods;
