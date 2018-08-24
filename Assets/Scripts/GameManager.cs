@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using CLI;
 
 public class GameManager : MonoBehaviour {
 
@@ -8,6 +9,7 @@ public class GameManager : MonoBehaviour {
     public void Ping()
     {
         Debug.Log("Pong");
+        CLIManager.Log("Pong");
     }
 
     [ConsoleCommand]
@@ -50,6 +52,12 @@ public class GameManager : MonoBehaviour {
     public int GetRandomNumber()
     {
         return Random.Range(0, 10000);
+    }
+
+    [ConsoleCommand("Misc.Random.Numbers")]
+    public void PrintRandomInt()
+    {
+        Debug.Log(Random.Range(0, 10000));
     }
 
 }
