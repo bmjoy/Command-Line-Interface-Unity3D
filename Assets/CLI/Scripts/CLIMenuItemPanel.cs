@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace CLI
 {
-    public class CLIMenuDropDown : MonoBehaviour
+    public class CLIMenuItemPanel : MonoBehaviour
     {
         [HideInInspector]
         public CLIMenuButton button;
@@ -17,7 +17,8 @@ namespace CLI
             {
                 if (!EventSystem.current.IsPointerOverGameObject())
                 {
-                    CLIManager.Instance.DestroyAllDropDowns();
+                    CLIMenu.Instance.DestroyAllOpenPanels();
+                    CLIMenu.Instance.ResetAllMenuButtons();
                 }
             }
         }

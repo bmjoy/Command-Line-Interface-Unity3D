@@ -54,4 +54,10 @@ public class GameManager : MonoBehaviour {
         return Random.Range(0, 10000);
     }
 
+    [ConsoleCommand("Misc.Random.Numbers")]
+    public void PrintRandomInt()
+    {
+        Debug.Log(Random.Range(0, 10000));
+    }
+
 }

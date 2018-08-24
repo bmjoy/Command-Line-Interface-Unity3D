@@ -1,37 +1,56 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace CLI
 {
     public class CLIMenuButton : MonoBehaviour
     {
         public GameObject menuDropdownPrefab;
+        public GameObject menuItemPrefab;
         [HideInInspector]
-        public bool dropdownOpen = false;
+        public bool panelOpen = false;
         [HideInInspector]
         public bool isRoot = false;
 
+        [HideInInspector]
+        public CLINode node;
+
         public void OnClick()
         {
-            if (!dropdownOpen)
+            if (!panelOpen)
             {
-                if (isRoot)
-                    CLIManager.Instance.DestroyAllDropDowns();
+                CLIMenu.Instance.ResetAllMenuButtons();
+                CLIMenu.Instance.DestroyAllOpenPanels();
 
                 RectTransform rectTransform = GetComponent<RectTransform>();
 
-                RectTransform dropdown = Instantiate(menuDropdownPrefab).GetComponent<RectTransform>();
-                dropdown.transform.SetParent(CLIManager.Instance.transform);
+                RectTransform panel = Instantiate(menuDropdownPrefab).GetComponent<RectTransform>();
+                panel.transform.SetParent(CLIManager.Instance.transform);
 
-                dropdown.anchoredPosition = rectTransform.anchoredPosition - new Vector2(rectTransform.rect.width / 2, rectTransform.rect.height / 2);
+                CLIMenu.Instance.openPanels.Add(panel);
 
-                CLIMenuDropDown d = dropdown.GetComponent<CLIMenuDropDown>();
-                d.button = this;
+                panel.anchoredPosition = rectTransform.anchoredPosition - new Vector2(rectTransform.rect.width / 2, rectTransform.rect.height / 2);
 
-                CLIManager.Instance.openDropdowns.Add(d);
+                CLIMenuItemPanel p = panel.GetComponent<CLIMenuItemPanel>();
+                p.button = this;
 
-                dropdownOpen = true;
+                CLIMenu.Instance.openPanels.Add(panel);
+
+                foreach (var node in node.children)
+                {
+                    RectTransform menuItem = Instantiate(menuItemPrefab).GetComponent<RectTransform>();
+                    menuItem.SetParent(panel);
+                    menuItem.GetComponentInChildren<Text>().text = node.name;
+                    CLIMenuItem m = menuItem.GetComponent<CLIMenuItem>();
+                    m.node = node;
+                    if (node.children.Count > 0)
+                        m.arrow.gameObject.SetActive(true);
+                }
+                
+
+                panelOpen = true;
             }
         }
     }

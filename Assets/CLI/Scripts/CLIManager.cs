@@ -35,9 +35,6 @@ namespace CLI
 
         private string lastCommand;
 
-        [HideInInspector]
-        public List<CLIMenuDropDown> openDropdowns = new List<CLIMenuDropDown>();
-
         public static CLIManager Instance { get; set; }
 
         [MenuItem("CLI/Add CLI")]
@@ -99,6 +96,9 @@ namespace CLI
 
                 CLIMenuButton m = menuButton.GetComponent<CLIMenuButton>();
                 m.isRoot = true;
+                m.node = node;
+
+                CLIMenu.Instance.buttons.Add(m);
 
                 menuButton.transform.SetParent(menu);
             }
@@ -533,15 +533,7 @@ namespace CLI
         { typeof(Nullable<char>), "char?" }
     };
 
-        public void DestroyAllDropDowns()
-        {
-            for (int i = openDropdowns.Count - 1; i >= 0; i--)
-            {
-                openDropdowns[i].button.dropdownOpen = false;
-                Destroy(openDropdowns[i].gameObject);
-                openDropdowns.Remove(openDropdowns[i]);
-            }
-        }
+        
 
     }
 }

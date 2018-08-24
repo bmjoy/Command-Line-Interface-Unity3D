@@ -216,7 +216,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuDropdownPrefab: {fileID: 1639421664639098, guid: eb3bf8a347a017c4ab1fa88249c0724e,
     type: 2}
-  canvas: {fileID: 0}
+  menuItemPrefab: {fileID: 1942133913457296, guid: 57a7a423bcdebb7449557df9b044d398,
+    type: 2}
+  dropdownOpen: 0
+  isRoot: 0
 --- !u!114 &114961080109047780
 MonoBehaviour:
   m_ObjectHideFlags: 1
